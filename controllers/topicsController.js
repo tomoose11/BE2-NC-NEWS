@@ -21,6 +21,14 @@ exports.postTopic = (req, res, next) => {
 
 exports.getArticlesForOneTopic = (req, res, next) => {
   let counter = 0;
+  const {
+    limit = 10,
+    sort_by = "created_at",
+    p = "page",
+    sort_ascending = true
+  } = req.query;
+  //sort_ascending = true;
+  const sortOrder = sort_ascending === "true" ? "asc" : "desc";
   db("articles")
     .column(
       { author: "users.username" },
@@ -30,9 +38,9 @@ exports.getArticlesForOneTopic = (req, res, next) => {
       "created_at",
       "topic"
     )
-    //.select()
+    .limit(limit)
+    .orderBy("created_at", sortOrder)
     .innerJoin("users", "users.user_id", "articles.user_id")
-    //.innerJoin("comments", "comments.article_id", "articles.article_id")
     .where("topic", req.params.topic)
     .then(articles => {
       const ob = articles.forEach(item => {
@@ -49,7 +57,4 @@ exports.getArticlesForOneTopic = (req, res, next) => {
           });
       });
     });
-  // .then(articles => {
-  //   res.send(articles);
-  // });
 };
