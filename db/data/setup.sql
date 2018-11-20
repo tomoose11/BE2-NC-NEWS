@@ -1,0 +1,4 @@
+DROP DATABASE IF EXISTS knews;
+CREATE DATABASE knews;
+
+\c knews;
