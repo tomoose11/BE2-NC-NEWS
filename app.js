@@ -1,22 +1,24 @@
-const express = require("express");
+const express = require('express');
+const bodyParser = require('body-parser');
+const { error404 } = require('./errors/errors');
+const apiRouter = require('./routers/apiRouter');
+
 const app = express();
-const bodyParser = require("body-parser");
-const apiRouter = require("./routers/apiRouter");
+
 
 app.use(bodyParser.json());
 
-app.use("/api", apiRouter);
+app.use('/api', apiRouter);
 
-app.use("/*", (req, res, next) => {
-  next({ status: 404, message: "page not found" });
-});
+app.use(error404);
 
 app.use((err, req, res, next) => {
+  console.log('herei am ', err);
+
   if (err.status) {
     return res.status(404).send({ status: err.status, message: err.message });
-  } else {
-    res.status(500).send({ status: 500, message: "Internal server error" });
   }
+  return res.status(500).send({ status: 500, message: 'Internal server error' });
 });
 
 module.exports = app;
