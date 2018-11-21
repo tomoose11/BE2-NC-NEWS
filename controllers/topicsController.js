@@ -29,22 +29,34 @@ exports.getArticlesForOneTopic = (req, res, next) => {
     sort_ascending = true,
   } = req.query;
   const sortOrder = sort_ascending === 'true' ? 'asc' : 'desc';
-  db('articles')
-    .select('*')
+  db
+    .column(
+      // { author: 'users.username' },
+      'articles.title',
+      'articles.article_id',
+      'votes',
+      'created_at',
+      'topic',
+      't.count',
+    )
+    // .select('*')
+    .from((qb) => {
+      qb.select('article_id').from('comments').groupBy('article_id')
+        .count('*')
+        .as('t');
+    })
 
-    // .column(
-    //   { author: 'users.username' },
-    //   'title',
-    //   'article_id',
-    //   'votes',
-    //   'created_at',
-    //   'topic',
-    // )
-    // .limit(limit)
-    // .orderBy('created_at', sortOrder)
-    // .innerJoin('users', 'users.user_id', 'articles.user_id')
-    .groupBy('topic')
-    // .where('topic', req.params.topic)
+
+  //   .from('articles')
+  //   // .limit(limit)
+  //   // .orderBy('created_at', sortOrder)
+    .join('articles', 'articles.article_id', '=', 't.article_id')
+
+  //   // .count('articles.article_id')
+  //   .where('topic', req.params.topic)
+  //   .count('*')
+  //   .groupBy('topic')
+
     .then((articles) => {
       res.send(articles);
     });
