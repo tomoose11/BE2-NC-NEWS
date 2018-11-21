@@ -22,7 +22,7 @@ describe('/api', () => {
         expect(req.body.length).to.equal(2);
       }));
 
-    it('GET responds with  a 404 when path is not definined', () => request.get('/api/top')
+    it('GET responds with  a 404 when path is not definined properly', () => request.get('/api/top')
       .expect(404)
       .then((req) => {
         expect(req.body.message).to.eql('path does not exist');
