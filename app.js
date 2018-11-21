@@ -13,10 +13,8 @@ app.use('/api', apiRouter);
 app.use(error404);
 
 app.use((err, req, res, next) => {
-  console.log('herei am ', err);
-
   if (err.status) {
-    return res.status(404).send({ status: err.status, message: err.message });
+    return res.status(err.status).send({ status: err.status, message: err.message });
   }
   return res.status(500).send({ status: 500, message: 'Internal server error' });
 });

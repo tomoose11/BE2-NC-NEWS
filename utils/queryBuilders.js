@@ -34,5 +34,6 @@ exports.buildArticles = (req, res, next) => {
     // .where('topic', req.params.topic)
     .then((articles) => {
       res.send(articles);
-    });
+    })
+    .catch(err => console.log(err));
 };
