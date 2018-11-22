@@ -13,6 +13,12 @@ describe('/api', () => {
 
   after(() => knex.destroy());
 
+  it('GET responds with  a 404 when path does not exist', () => request.get('/api/top')
+    .expect(404)
+    .then((req) => {
+      expect(req.body.message).to.eql('path does not exist');
+    }));
+
   describe('/topics', () => {
     it('GET responds with a 200 and an array of topic objects', () => request
       .get('/api/topics')
@@ -22,13 +28,6 @@ describe('/api', () => {
         expect(body[0]).to.have.all.keys('slug', 'description');
         expect(body.length).to.equal(2);
       }));
-    it('GET responds with  a 404 when path is not definined properly', () => request.get('/api/top')
-      .expect(404)
-      .then((req) => {
-        expect(req.body.message).to.eql('path does not exist');
-      }));
-
-
     it('POST responds with 201 and shows the item posted with created id', () => {
       const testObject = {
         slug: 'mit',
@@ -56,7 +55,20 @@ describe('/api', () => {
           expect(res.body.message).to.eql('path does not exist');
         });
     });
-    it('DELETE responds with 404 when path is not defined', () => request.delete('/api/topics')
+    it('POST responds with 422 when duplicat slug entered', () => {
+      const testObject = {
+        slug: 'mitch',
+        description: 'The man',
+      };
+      return request
+        .post('/api/topics')
+        .send(testObject).expect(422)
+        .then((res) => {
+          expect(res.body.message).to.eql('Key (slug)=(mitch) already exists.');
+        });
+    });
+
+    it('DELETE responds with 405 when method is not allowed', () => request.delete('/api/topics')
       .expect(405)
       .then(({ body }) => {
         expect(body.message).to.equal('method not allowed');
@@ -67,7 +79,26 @@ describe('/api', () => {
     it('GET should return 200 with an array of articles for a specific topic', () => request.get('/api/topics/mitch/articles')
       .expect(200)
       .then(({ body }) => {
-        expect(body[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'created_at', 'topic', 'count');
+        expect(body[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'created_at', 'topic', 'comments_count');
+      }));
+    it('GET should return a 400 if an invalid data type id used as a parameter', () => request.get('/api/topics/1/articles')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).to.equal('invalid data type');
+      }));
+
+    it('DELETE should return a 405 method not allowed', () => request.delete('/api/topics/mitch/articles')
+      .expect(405)
+      .then(({ body }) => {
+        expect(body.message).to.eql('method not allowed');
+      }));
+  });
+  describe('/articles', () => {
+    it('GET should return 200 with an array of articles for a specific topic', () => request.get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'created_at', 'topic', 'comments_count');
+        expect(body.length).to.equal(12);
       }));
     it('GET should return a 400 if an invalid data type id used as a parameter', () => request.get('/api/topics/1/articles')
       .expect(400)

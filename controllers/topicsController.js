@@ -72,5 +72,6 @@ exports.postArticlesForOneTopic = (req, res, next) => {
     .returning('*')
     .then((article) => {
       res.send(article);
-    });
+    })
+    .catch(err => console.log(err));
 };

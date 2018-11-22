@@ -17,7 +17,7 @@ exports.buildArticles = (req, res, next) => {
       'votes',
       'created_at',
       'topic',
-      't.count',
+      { comments_count: 't.count' },
     )
     .from((qb) => {
       qb.select('comments.article_id', 'articles.user_id').from('comments')

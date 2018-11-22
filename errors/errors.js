@@ -13,3 +13,9 @@ exports.handle400 = (err, req, res, next) => {
 exports.handle405 = (req, res, next) => {
   next({ status: 405, message: 'method not allowed' });
 };
+
+exports.handle422 = (err, req, res, next) => {
+  if (err.code === '23505') {
+    next({ status: 422, message: err.detail });
+  } else { next(err); }
+};

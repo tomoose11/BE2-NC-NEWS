@@ -42,7 +42,6 @@ exports.getArticles = (req, res, next) => {
 };
 
 exports.getOneArticle = (req, res, next) => {
-  let counter = 0;
   const {
     limit = 10,
     sort_by = 'created_at',
@@ -108,5 +107,25 @@ exports.deleteOneArticle = (req, res, next) => {
     .returning('*')
     .then((votes) => {
       res.send(votes);
+    });
+};
+
+exports.getArrayOfCommentsForOneArticle = (req, res, next) => {
+  const {
+    limit = 10,
+    sort_by = 'created_at',
+    p = 0,
+    sort_ascending = true,
+  } = req.query;
+  const sortOrder = sort_ascending === 'true' ? 'asc' : 'desc';
+  db('comments')
+    .column('article_id', 'comment_id', 'votes', 'created_at', { author: 'username' }, 'body')
+    .join('users', 'users.user_id', '=', 'comments.user_id')
+    .limit(limit)
+    .offset(p * limit)
+    .orderBy(sort_by, sortOrder)
+    .where('article_id', req.params.article_id)
+    .then((article) => {
+      res.send(article);
     });
 };
