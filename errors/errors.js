@@ -9,3 +9,7 @@ exports.error404 = ('/*', (req, res, next) => {
 exports.handle400 = (err, req, res, next) => {
   if (codes[err.code]) next({ status: 400, message: codes[err.code] });
 };
+
+exports.handle405 = (req, res, next) => {
+  next({ status: 405, message: 'method not allowed' });
+};

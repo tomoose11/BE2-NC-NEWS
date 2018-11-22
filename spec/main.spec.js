@@ -56,6 +56,11 @@ describe('/api', () => {
           expect(res.body.message).to.eql('path does not exist');
         });
     });
+    it('DELETE responds with 404 when path is not defined', () => request.delete('/api/topics')
+      .expect(405)
+      .then(({ body }) => {
+        expect(body.message).to.equal('method not allowed');
+      }));
   });
 
   describe('/topic/topic:/articles', () => {
@@ -64,10 +69,16 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'created_at', 'topic', 'count');
       }));
-    it('GET should return 200 with an array of articles for a specific topic', () => request.get('/api/topics/1/articles')
+    it('GET should return a 400 if an invalid data type id used as a parameter', () => request.get('/api/topics/1/articles')
       .expect(400)
       .then(({ body }) => {
         expect(body.message).to.equal('invalid data type');
+      }));
+
+    it('DELETE should return a 405 method not allowed', () => request.delete('/api/topics/mitch/articles')
+      .expect(405)
+      .then(({ body }) => {
+        expect(body.message).to.eql('method not allowed');
       }));
   });
 });

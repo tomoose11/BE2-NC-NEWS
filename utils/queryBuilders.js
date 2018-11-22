@@ -20,18 +20,19 @@ exports.buildArticles = (req, res, next) => {
       't.count',
     )
     .from((qb) => {
-      qb.select('article_id').from('comments').groupBy('article_id')
-        .count('*')
+      qb.select('comments.article_id', 'articles.user_id').from('comments')
+        .rightJoin('articles', 'comments.article_id', 'articles.article_id')
+        .groupBy('articles.article_id', 'comments.article_id')
+        .count('comment_id')
         .as('t');
     })
-    .join('articles', 'articles.article_id', '=', 't.article_id')
-    .join('users', 'users.user_id', '=', 'articles.user_id')
+    .leftJoin('articles', 't.article_id', 'articles.article_id')
+    .join('users', 'users.user_id', '=', 't.user_id')
     .modify((qb) => {
       if (req.params.topic) {
         qb.where('topic', req.params.topic);
       }
     })
-    // .where('topic', req.params.topic)
     .then((articles) => {
       res.send(articles);
     })

@@ -1,4 +1,5 @@
 const topicsRouter = require('express').Router();
+const { handle405 } = require('../errors/errors');
 const {
   getTopic,
   postTopic,
@@ -10,7 +11,8 @@ const {
 topicsRouter
   .route('/')
   .get(getTopic)
-  .post(postTopic);
+  .post(postTopic)
+  .all(handle405);
 
 topicsRouter
   .param('topic', (req, res, next, id) => {
@@ -23,6 +25,7 @@ topicsRouter
   })
   .route('/:topic/articles')
   .get(getArticlesForOneTopic)
-  .post(postArticlesForOneTopic);
+  .post(postArticlesForOneTopic)
+  .all(handle405);
 
 module.exports = topicsRouter;
