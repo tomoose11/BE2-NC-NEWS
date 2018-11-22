@@ -24,10 +24,11 @@ describe('/api', () => {
       .get('/api/topics')
       .expect(200)
       .then(({ body }) => {
-        expect(body).to.be.an('array');
-        expect(body[0]).to.have.all.keys('slug', 'description');
-        expect(body.length).to.equal(2);
+        expect(body.topics).to.be.an('array');
+        expect(body.topics[0]).to.have.all.keys('slug', 'description');
+        expect(body.topics.length).to.equal(2);
       }));
+
     it('POST responds with 201 and shows the item posted with created id', () => {
       const testObject = {
         slug: 'mit',
@@ -75,17 +76,42 @@ describe('/api', () => {
       }));
   });
 
+
   describe('/topic/topic:/articles', () => {
     it('GET should return 200 with an array of articles for a specific topic', () => request.get('/api/topics/mitch/articles')
       .expect(200)
       .then(({ body }) => {
-        expect(body[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'created_at', 'topic', 'comments_count');
+        expect(body.articles[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'created_at', 'topic', 'comments_count');
       }));
     it('GET should return a 400 if an invalid data type id used as a parameter', () => request.get('/api/topics/1/articles')
       .expect(400)
       .then(({ body }) => {
         expect(body.message).to.equal('invalid data type');
       }));
+
+    it('POST responds with 201 and shows the item posted with created id', () => {
+      const testObject = {
+        title: "They're not exactly dogs, are they?",
+        user_id: 2,
+        body: 'Well? Think about it.',
+      };
+      const expectedOb = {
+        article_id: 13,
+        title: "They're not exactly dogs, are they?",
+        body: 'Well? Think about it.',
+        votes: 0,
+        topic: 'mitch',
+        user_id: 2,
+        created_at: '2018-11-22T14:31:46.814Z',
+      };
+      return request
+        .post('/api/topics/mitch/articles')
+        .send(testObject).expect(201)
+        .then((res) => {
+          expect(res.body).to.be.an('object');
+          expect(res.body.title).to.eql("They're not exactly dogs, are they?");
+        });
+    });
 
     it('DELETE should return a 405 method not allowed', () => request.delete('/api/topics/mitch/articles')
       .expect(405)
@@ -93,19 +119,15 @@ describe('/api', () => {
         expect(body.message).to.eql('method not allowed');
       }));
   });
+
+
   describe('/articles', () => {
     it('GET should return 200 with an array of articles for a specific topic', () => request.get('/api/articles')
       .expect(200)
       .then(({ body }) => {
-        expect(body[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'created_at', 'topic', 'comments_count');
-        expect(body.length).to.equal(12);
+        expect(body.articles[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'created_at', 'topic', 'comments_count');
+        expect(body.articles.length).to.equal(10);
       }));
-    it('GET should return a 400 if an invalid data type id used as a parameter', () => request.get('/api/topics/1/articles')
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.message).to.equal('invalid data type');
-      }));
-
     it('DELETE should return a 405 method not allowed', () => request.delete('/api/topics/mitch/articles')
       .expect(405)
       .then(({ body }) => {

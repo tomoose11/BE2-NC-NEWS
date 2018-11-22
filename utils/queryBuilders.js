@@ -1,15 +1,14 @@
 const db = require('../db/connection');
 
 exports.buildArticles = (req, res, next) => {
-  const counter = 0;
   const {
     limit = 10,
     sort_by = 'created_at',
-    p = 'page',
+    p = 0,
     sort_ascending = true,
   } = req.query;
   const sortOrder = sort_ascending === 'true' ? 'asc' : 'desc';
-  db
+  return db
     .column(
       { author: 'users.username' },
       'articles.title',
@@ -28,13 +27,15 @@ exports.buildArticles = (req, res, next) => {
     })
     .leftJoin('articles', 't.article_id', 'articles.article_id')
     .join('users', 'users.user_id', '=', 't.user_id')
+    .limit(limit)
+    .offset(p * limit)
+    .orderBy(sort_by, sortOrder)
     .modify((qb) => {
       if (req.params.topic) {
         qb.where('topic', req.params.topic);
       }
-    })
-    .then((articles) => {
-      res.send(articles);
-    })
-    .catch(err => console.log(err));
+      if (req.params.article_id) {
+        qb.where('articles.article_id', req.params.article_id);
+      }
+    });
 };
