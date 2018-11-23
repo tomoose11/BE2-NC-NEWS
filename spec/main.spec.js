@@ -181,7 +181,7 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body.articles[0].author).to.eql('rogersop');
       }));
-    it.only('GET QUERY P: should sort by page number', () => request.get('/api/articles?limit=50')
+    it('GET QUERY P: should sort by page number', () => request.get('/api/articles?limit=50')
       .expect(200)
       .then(({ body }) => {
         console.log(body.articles);
