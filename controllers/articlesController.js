@@ -12,7 +12,7 @@ exports.getOneArticle = (req, res, next) => {
     if (article.length === 0) {
       next({ status: 404, message: 'path does not exist' });
     } else { res.send(article[0]); }
-  });
+  }).catch(next);
 };
 
 exports.increaseVotes = (req, res, next) => {
@@ -47,9 +47,10 @@ exports.deleteOneArticle = (req, res, next) => {
     .where('article_id', req.params.article_id)
     .del()
     .returning('*')
-    .then((article1) => {
+    .then(() => {
       res.status(204).send();
-    });
+    })
+    .catch(next);
 };
 
 exports.getArrayOfCommentsForOneArticle = (req, res, next) => {
@@ -68,6 +69,25 @@ exports.getArrayOfCommentsForOneArticle = (req, res, next) => {
     .orderBy(sort_by, sortOrder)
     .where('article_id', req.params.article_id)
     .then((comments) => {
-      res.send({ comments });
+      if (comments.length === 0) {
+        next({ status: 404, message: 'path does not exist' });
+      } else { res.send({ comments }); }
+    })
+    .catch(next);
+};
+
+exports.postOneCommentForAnArticle = (req, res, next) => {
+  const { user_id, body } = req.body;
+  db('comments')
+    .insert({ article_id: req.params.article_id, user_id, body })
+    .returning('*')
+    .then((comment) => {
+      res.status(201).send(comment[0]);
+    })
+    .catch((err) => {
+      if (err.code === '23503') {
+        next({ status: 404, message: 'path does not exist' });
+      }
+      next(err);
     });
 };

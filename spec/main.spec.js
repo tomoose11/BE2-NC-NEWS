@@ -90,6 +90,26 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body.message).to.equal('invalid data type');
       }));
+    it('GET QUERY LIMIT: should apply the limit specified in the query', () => request.get('/api/topics/mitch/articles?limit=2')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).to.eql(2);
+      }));
+    it('GET QUERY SORT_BY: should apply sort_by to the specifed query', () => request.get('/api/topics/mitch/articles?sort_by=article_id')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].article_id).to.eql(9);
+      }));
+    it('GET QUERY P: should sort by page number', () => request.get('/api/topics/mitch/articles?p=1&limit=1')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].article_id).to.eql(9);
+      }));
+    it('GET QUERY SORT_ASCENDING: should sort by page number', () => request.get('/api/topics/mitch/articles?sort_ascending=true')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].article_id).to.eql(3);
+      }));
 
     it('POST responds with 201 and shows the item posted with created id', () => {
       const testObject = {
@@ -150,6 +170,28 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body.articles[0]).to.have.all.keys('author', 'title', 'article_id', 'votes', 'created_at', 'topic', 'comments_count');
         expect(body.articles.length).to.equal(10);
+      }));
+    it('GET QUERY LIMIT: should apply the limit specified in the query', () => request.get('/api/articles?limit=2')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).to.eql(2);
+      }));
+    it('GET QUERY SORT_BY: should apply sort_by to the specifed query', () => request.get('/api/articles?sort_by=author')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].author).to.eql('rogersop');
+      }));
+    it.only('GET QUERY P: should sort by page number', () => request.get('/api/articles?limit=50')
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body.articles);
+        expect(body.articles[0].article_id).to.eql(9);
+      }));
+    it('GET QUERY SORT_ASCENDING: should sort by page number', () => request.get('/api/topics/mitch/articles?sort_ascending=true')
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body.articles);
+        expect(body.articles[0].article_id).to.eql(3);
       }));
     it('Should return "method not allowed" messages for all request types not used for this path', () => {
       const invalidMethods = ['delete', 'put', 'patch'];
@@ -236,6 +278,68 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body.message).to.equal('invalid data type');
       }));
+    it('GET should return a 404 if parametric endpoint is of correct datatype but does not exist', () => request.get('/api/articles/1000/comments')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).to.equal('path does not exist');
+      }));
+
+    it('POST should return 201 and the body of the posted object', () => {
+      const testObject = {
+        user_id: 1,
+        body: 'stuff',
+      };
+
+      return request
+        .post('/api/articles/1/comments')
+        .send(testObject).expect(201)
+        .then((res) => {
+          expect(res.body).to.be.an('object');
+          expect(res.body.body).to.eql('stuff');
+        });
+    });
+    it('POST should return 404 and message saying path does not exist', () => {
+      const testObject = {
+        user_id: 1,
+        body: 'stuff',
+      };
+
+      return request
+        .post('/api/articles/1000/comments')
+        .send(testObject).expect(404)
+        .then((res) => {
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.eql('path does not exist');
+        });
+    });
+    it('POST should return 400 when null data is inserted into body', () => {
+      const testObject = {
+        user_id: null,
+        body: 'stuff',
+      };
+
+      return request
+        .post('/api/articles/1/comments')
+        .send(testObject).expect(400)
+        .then((res) => {
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.eql('violates not null input');
+        });
+    });
+    it('POST should return 400 when invalid data is inserted into body', () => {
+      const testObject = {
+        user_id: 'hh',
+        body: 'stuff',
+      };
+
+      return request
+        .post('/api/articles/1/comments')
+        .send(testObject).expect(400)
+        .then((res) => {
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.eql('invalid input syntax for integer');
+        });
+    });
 
     it('Should return "method not allowed" messages for all request types not used for this path', () => {
       const invalidMethods = ['delete', 'put', 'patch'];

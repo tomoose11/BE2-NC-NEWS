@@ -6,6 +6,7 @@ const {
   increaseVotes,
   deleteOneArticle,
   getArrayOfCommentsForOneArticle,
+  postOneCommentForAnArticle,
 } = require('../controllers/articlesController');
 
 
@@ -23,6 +24,7 @@ articleRouter
 
 articleRouter.route('/:article_id/comments')
   .get(getArrayOfCommentsForOneArticle)
+  .post(postOneCommentForAnArticle)
   .all(handle405);
 
 module.exports = articleRouter;
