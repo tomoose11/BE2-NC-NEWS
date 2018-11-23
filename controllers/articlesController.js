@@ -47,8 +47,8 @@ exports.deleteOneArticle = (req, res, next) => {
     .where('article_id', req.params.article_id)
     .del()
     .returning('*')
-    .then((votes) => {
-      res.send(votes);
+    .then((article1) => {
+      res.status(204).send();
     });
 };
 
@@ -67,7 +67,7 @@ exports.getArrayOfCommentsForOneArticle = (req, res, next) => {
     .offset(p * limit)
     .orderBy(sort_by, sortOrder)
     .where('article_id', req.params.article_id)
-    .then((article) => {
-      res.send(article);
+    .then((comments) => {
+      res.send({ comments });
     });
 };

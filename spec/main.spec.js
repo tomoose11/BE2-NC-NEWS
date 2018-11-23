@@ -159,7 +159,7 @@ describe('/api', () => {
 
 
   describe('/articles/:article_id', () => {
-    it('GET should return a 404 if parametric endpoint is of correct datatype but does not exist', () => request.get('/api/articles/1000')
+    it('should return a 404 if parametric endpoint is of correct datatype but does not exist', () => request.get('/api/articles/1000')
       .expect(404)
       .then(({ body }) => {
         expect(body.message).to.equal('path does not exist');
@@ -182,26 +182,64 @@ describe('/api', () => {
         .patch('/api/articles/1')
         .send(testObject).expect(200)
         .then((res) => {
-          console.log(res.body);
           expect(res.body.votes).to.eql(1);
         });
     });
-    it('PATCH should return 200 and increase votes if indicated to by object', () => {
+    it('PATCH should return 400 and invalid data type message if data invalid', () => {
       const testObject = { inc_votes: 'ff' };
 
       return request
         .patch('/api/articles/1')
         .send(testObject).expect(400)
         .then((res) => {
-          console.log(res.body);
           expect(res.body.message).to.eql('invalid data type');
         });
     });
 
+    it('DELETE should return 200, delete chosen article and any foreign keys referencing the article', () => {
+      const testObject = { inc_votes: 1 };
+
+      return request
+        .delete('/api/articles/1')
+        .send(testObject).expect(204)
+        .then((res) => {
+          expect(res.body).to.eql({});
+        });
+    });
+    it('DELETE should return 400 invalid data type if paremetric contains invalid data', () => {
+      const testObject = { inc_votes: 1 };
+
+      return request
+        .delete('/api/articles/ff')
+        .send(testObject).expect(400)
+        .then((res) => {
+          expect(res.body.message).to.eql('invalid data type');
+        });
+    });
 
     it('Should return "method not allowed" messages for all request types not used for this path', () => {
       const invalidMethods = ['put'];
       return Promise.all(invalidMethods.map(method => request[method]('/api/articles/1').expect(405)));
+    });
+  });
+
+
+  describe('articles/:article_id/comments', () => {
+    it('GET should return a 200 and an array of comments of the chosen article', () => request.get('/api/articles/1/comments')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).to.be.an('array');
+        expect(body.comments.length).to.equal(10);
+      }));
+    it('GET should return a 400 and bad request if parametric endpoint if of the wrong datatype', () => request.get('/api/articles/ff/comments')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).to.equal('invalid data type');
+      }));
+
+    it('Should return "method not allowed" messages for all request types not used for this path', () => {
+      const invalidMethods = ['delete', 'put', 'patch'];
+      return Promise.all(invalidMethods.map(method => request[method]('/api/articles').expect(405)));
     });
   });
 });
