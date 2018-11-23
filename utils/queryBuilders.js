@@ -15,7 +15,7 @@ exports.buildArticles = (req, res, next) => {
     sort_by = 'created_at';
   }
 
-  if (!limit.toString().match(/[0-9]/g)) {
+  if (!limit.toString().match(/[0-9]/g) || !p.toString().match(/[0-9]/g)) {
     return new Promise(resolve => resolve(0));
   }
 

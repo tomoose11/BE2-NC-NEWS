@@ -3,7 +3,13 @@ const { buildArticles } = require('../utils/queryBuilders');
 
 exports.getArticles = (req, res, next) => {
   buildArticles(req, res, next).then((articles) => {
-    res.send({ articles });
+    if (articles === 0) {
+      next({ status: 400, message: 'A valid integer must be provided' });
+    } else if (articles.length === 0) {
+      next({ status: 404, message: 'path does not exist' });
+    } else {
+      res.send({ articles });
+    }
   }).catch(next);
 };
 

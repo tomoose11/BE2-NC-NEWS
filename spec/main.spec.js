@@ -111,6 +111,11 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body.articles[0].article_id).to.eql(11);
       }));
+    it('returns a 400 bad request for malformed query params', () => request.get('/api/topics/football/articles?limit=fsef')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).to.equal('A valid integer must be provided');
+      }));
 
     it('POST responds with 201 and shows the item posted with created id', () => {
       const testObject = {
@@ -135,7 +140,7 @@ describe('/api', () => {
       };
 
       return request
-        .post('/api/topics/mit/articles')
+        .post('/api/topics/mitch/articles')
         .send(testObject).expect(400)
         .then((res) => {
           expect(res.body).to.be.an('object');
@@ -150,11 +155,25 @@ describe('/api', () => {
       };
 
       return request
-        .post('/api/topics/mit/articles')
+        .post('/api/topics/mitch/articles')
         .send(testObject).expect(400)
         .then((res) => {
           expect(res.body).to.be.an('object');
           expect(res.body.message).to.eql('invalid input syntax for integer');
+        });
+    });
+    it('POST should return 404 when posting data to a topic that does not exist', () => {
+      const testObject = {
+        title: "They're not exactly dogs, are they?",
+        user_id: 1,
+        body: 'jkjkk',
+      };
+
+      return request
+        .post('/api/topics/mi/articles')
+        .send(testObject).expect(404)
+        .then((res) => {
+          expect(res.body.message).to.eql('Key (topic)=(mi) is not present in table "topics".');
         });
     });
 
@@ -182,17 +201,27 @@ describe('/api', () => {
       .then(({ body }) => {
         expect(body.articles[0].author).to.eql('rogersop');
       }));
+    it('GET QUERY SORT_BY: should sort by default if param is malformed', () => request.get('/api/articles?sort_by=fesfse')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].created_at).to.eql('2018-11-15T12:21:54.171Z');
+        expect(body.articles[2].created_at).to.eql('2017-12-24T05:38:51.243Z');
+      }));
     it('GET QUERY P: should sort by page number', () => request.get('/api/articles?limit=50')
       .expect(200)
       .then(({ body }) => {
-        console.log(body.articles);
         expect(body.articles[0].article_id).to.eql(1);
       }));
     it('GET QUERY SORT_ASCENDING: should sort by page number', () => request.get('/api/topics/mitch/articles?sort_ascending=true')
       .expect(200)
       .then(({ body }) => {
-        console.log(body.articles);
         expect(body.articles[0].article_id).to.eql(11);
+      }));
+
+    it('returns a 400 bad request for malformed query params', () => request.get('/api/articles?limit=fsef')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).to.equal('A valid integer must be provided');
       }));
     it('Should return "method not allowed" messages for all request types not used for this path', () => {
       const invalidMethods = ['delete', 'put', 'patch'];
@@ -220,7 +249,6 @@ describe('/api', () => {
 
     it('PATCH should return 200 and increase votes if indicated to by object', () => {
       const testObject = { inc_votes: 1 };
-
       return request
         .patch('/api/articles/1')
         .send(testObject).expect(200)
