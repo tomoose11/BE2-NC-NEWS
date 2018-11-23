@@ -15,8 +15,12 @@ exports.increaseVotesForComments = (req, res, next) => {
       }
     })
     .returning('*')
-    .then((votes) => {
-      res.send(votes);
+    .then((comment) => {
+      if (typeof inc_votes !== 'number') {
+        next({ status: 400, message: 'invalid data type' });
+      } else {
+        res.send(comment[0]);
+      }
     });
 };
 

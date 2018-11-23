@@ -22,7 +22,9 @@ exports.postTopic = (req, res, next) => {
 
 exports.getArticlesForOneTopic = (req, res, next) => {
   buildArticles(req, res, next).then((articles) => {
-    if (articles.length === 0) {
+    if (articles === 0) {
+      next({ status: 400, message: 'A valid integer must be provided' });
+    } else if (articles.length === 0) {
       next({ status: 404, message: 'path does not exist' });
     } else {
       res.send({ articles });

@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { error404, handle422, handle400 } = require('./errors/errors');
+const {
+  error404, handle422, handle400, handle404forNonExistingPostParents,
+} = require('./errors/errors');
 const apiRouter = require('./routers/apiRouter');
 
 const app = express();
@@ -12,12 +14,15 @@ app.use('/api', apiRouter);
 
 app.use(error404);
 
+
 app.use(handle422);
 
 app.use(handle400);
 
+app.use(handle404forNonExistingPostParents);
+
+
 app.use((err, req, res, next) => {
-  console.log(err);
   if (err.status) {
     return res.status(err.status).send({ status: err.status, message: err.message });
   }

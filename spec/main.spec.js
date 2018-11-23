@@ -3,6 +3,7 @@ const { expect } = require('chai');
 const supertest = require('supertest');
 const app = require('../app');
 const knex = require('../db/connection');
+const testData = require('../db/data/test-data');
 
 const request = supertest(app);
 
@@ -185,13 +186,13 @@ describe('/api', () => {
       .expect(200)
       .then(({ body }) => {
         console.log(body.articles);
-        expect(body.articles[0].article_id).to.eql(9);
+        expect(body.articles[0].article_id).to.eql(1);
       }));
     it('GET QUERY SORT_ASCENDING: should sort by page number', () => request.get('/api/topics/mitch/articles?sort_ascending=true')
       .expect(200)
       .then(({ body }) => {
         console.log(body.articles);
-        expect(body.articles[0].article_id).to.eql(3);
+        expect(body.articles[0].article_id).to.eql(11);
       }));
     it('Should return "method not allowed" messages for all request types not used for this path', () => {
       const invalidMethods = ['delete', 'put', 'patch'];
@@ -240,7 +241,7 @@ describe('/api', () => {
 
     it('DELETE should return 200, delete chosen article and any foreign keys referencing the article', () => {
       const testObject = { inc_votes: 1 };
-
+      expect(testData.articleData.length).to.equal(12);
       return request
         .delete('/api/articles/1')
         .send(testObject).expect(204)
@@ -344,6 +345,20 @@ describe('/api', () => {
     it('Should return "method not allowed" messages for all request types not used for this path', () => {
       const invalidMethods = ['delete', 'put', 'patch'];
       return Promise.all(invalidMethods.map(method => request[method]('/api/articles').expect(405)));
+    });
+  });
+
+
+  describe('/comments/:comment_id', () => {
+    it('PATCH should return 400 and invalid data type message if data invalid', () => {
+      const testObject = { inc_votes: 'ff' };
+
+      return request
+        .patch('/api/comments/1')
+        .send(testObject).expect(400)
+        .then((res) => {
+          expect(res.body.message).to.eql('invalid data type');
+        });
     });
   });
 });

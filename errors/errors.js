@@ -22,6 +22,11 @@ exports.handle405 = (req, res, next) => {
   next({ status: 405, message: 'method not allowed' });
 };
 
+exports.handle404forNonExistingPostParents = (err, req, res, next) => {
+  if (err.code === '23503') next({ status: 404, message: err.detail });
+  else { next(err); }
+};
+
 exports.handle422 = (err, req, res, next) => {
   if (err.code === '23505') {
     next({ status: 422, message: err.detail });

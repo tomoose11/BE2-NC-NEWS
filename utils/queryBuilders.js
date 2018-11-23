@@ -3,11 +3,22 @@ const db = require('../db/connection');
 exports.buildArticles = (req, res, next) => {
   const {
     limit = 10,
-    sort_by = 'created_at',
     p = 0,
     sort_ascending = 'false',
   } = req.query;
+  let sort_by = req.query.sort_by || 'created_at';
   const sortOrder = sort_ascending === 'true' ? 'asc' : 'desc';
+
+  const sortOb = ['author', 'title', 'article_id', 'votes', 'comment_count', 'created_at'];
+
+  if (!sortOb.includes(sort_by)) {
+    sort_by = 'created_at';
+  }
+
+  if (!limit.toString().match(/[0-9]/g)) {
+    return new Promise(resolve => resolve(0));
+  }
+
 
   return db('comments').rightJoin('articles', 'comments.article_id', 'articles.article_id')
     .leftJoin('users', 'articles.user_id', 'users.user_id')
