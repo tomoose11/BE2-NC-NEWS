@@ -1,17 +1,17 @@
 exports.up = function (knex, Promise) {
   return knex.schema.createTable('articles', (articlesTable) => {
-    articlesTable.increments('article_id').primary();
+    articlesTable.increments('article_id').primary().unsigned();
     articlesTable.string('title').notNullable();
     articlesTable.string('body', 10000).notNullable();
-    articlesTable.integer('votes').defaultTo(0);
+    articlesTable.integer('votes').defaultTo(0).unsigned();
     articlesTable
       .string('topic')
       .references('topics.slug')
-      .notNullable();
+      .notNullable().unsigned();
     articlesTable
       .integer('user_id')
       .references('users.user_id')
-      .notNullable();
+      .notNullable().unsigned();
     articlesTable.datetime('created_at').defaultTo(knex.fn.now());
   });
 };

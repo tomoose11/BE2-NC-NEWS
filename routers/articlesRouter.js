@@ -1,5 +1,5 @@
 const articleRouter = require('express').Router();
-const { handle405 } = require('../errors/errors');
+const { handle405, handle400atRouter } = require('../errors/errors');
 const {
   getArticles,
   getOneArticle,
@@ -8,9 +8,13 @@ const {
   getArrayOfCommentsForOneArticle,
 } = require('../controllers/articlesController');
 
-articleRouter.get('/', getArticles);
+
+articleRouter.route('/').get(getArticles).all(handle405);
 
 articleRouter
+  .param('article_id', (req, res, next) => {
+    handle400atRouter(req.params.article_id, next);
+  })
   .route('/:article_id')
   .get(getOneArticle)
   .patch(increaseVotes)

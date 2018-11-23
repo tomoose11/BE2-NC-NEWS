@@ -15,8 +15,7 @@ topicsRouter
   .all(handle405);
 
 topicsRouter
-  .param('topic', (req, res, next, id) => {
-    console.log(req.params);
+  .param('topic', (req, res, next) => {
     if (req.params.topic.match(/[1-9]/g) || req.params.topic === '1') {
       next({ status: 400, message: 'invalid data type' });
     } else {

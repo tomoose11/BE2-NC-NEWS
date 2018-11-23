@@ -4,12 +4,13 @@ exports.up = function (knex, Promise) {
     commentsTable
       .integer('user_id')
       .references('users.user_id')
-      .notNullable();
+      .notNullable().unsigned();
     commentsTable
       .integer('article_id')
       .references('articles.article_id')
-      .notNullable().onDelete('CASCADE');
-    commentsTable.integer('votes').defaultTo(0);
+      .notNullable().onDelete('CASCADE')
+      .unsigned();
+    commentsTable.integer('votes').defaultTo(0).unsigned();
     commentsTable.datetime('created_at').defaultTo(knex.fn.now());
     commentsTable.string('body', 10000).notNullable();
   });

@@ -5,7 +5,6 @@ exports.getTopic = (req, res, next) => {
   db('topics')
     .select()
     .then((topics) => {
-      console.log(topics);
       res.send({ topics });
     })
     .catch(next);
@@ -23,8 +22,12 @@ exports.postTopic = (req, res, next) => {
 
 exports.getArticlesForOneTopic = (req, res, next) => {
   buildArticles(req, res, next).then((articles) => {
-    res.send({ articles });
-  });
+    if (articles.length === 0) {
+      next({ status: 404, message: 'path does not exist' });
+    } else {
+      res.send({ articles });
+    }
+  }).catch(next);
 };
 
 exports.postArticlesForOneTopic = (req, res, next) => {
@@ -39,8 +42,7 @@ exports.postArticlesForOneTopic = (req, res, next) => {
     })
     .returning('*')
     .then((article) => {
-      console.log(article[0]);
       res.status(201).send(article[0]);
     })
-    .catch(err => console.log(err));
+    .catch(next);
 };

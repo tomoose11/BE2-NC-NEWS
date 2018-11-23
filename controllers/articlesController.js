@@ -9,7 +9,9 @@ exports.getArticles = (req, res, next) => {
 
 exports.getOneArticle = (req, res, next) => {
   buildArticles(req, res, next).then((article) => {
-    res.send(article[0]);
+    if (article.length === 0) {
+      next({ status: 404, message: 'path does not exist' });
+    } else { res.send(article[0]); }
   });
 };
 
@@ -28,9 +30,14 @@ exports.increaseVotes = (req, res, next) => {
       }
     })
     .returning('*')
-    .then((votes) => {
-      res.send(votes);
-    });
+    .then((article) => {
+      if (typeof inc_votes !== 'number') {
+        next({ status: 400, message: 'invalid data type' });
+      } else {
+        res.send(article[0]);
+      }
+    })
+    .catch(next);
 };
 
 
