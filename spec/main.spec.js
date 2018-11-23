@@ -98,17 +98,17 @@ describe('/api', () => {
     it('GET QUERY SORT_BY: should apply sort_by to the specifed query', () => request.get('/api/topics/mitch/articles?sort_by=article_id')
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles[0].article_id).to.eql(9);
+        expect(body.articles[0].article_id).to.eql(12);
       }));
     it('GET QUERY P: should sort by page number', () => request.get('/api/topics/mitch/articles?p=1&limit=1')
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles[0].article_id).to.eql(9);
+        expect(body.articles[0].article_id).to.eql(12);
       }));
     it('GET QUERY SORT_ASCENDING: should sort by page number', () => request.get('/api/topics/mitch/articles?sort_ascending=true')
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles[0].article_id).to.eql(3);
+        expect(body.articles[0].article_id).to.eql(11);
       }));
 
     it('POST responds with 201 and shows the item posted with created id', () => {
