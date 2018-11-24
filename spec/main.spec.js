@@ -267,26 +267,24 @@ describe('/api', () => {
         });
     });
 
-    it('DELETE should return 200, delete chosen article and any foreign keys referencing the article', () => {
-      const testObject = { inc_votes: 1 };
-      expect(testData.articleData.length).to.equal(12);
-      return request
-        .delete('/api/articles/1')
-        .send(testObject).expect(204)
-        .then((res) => {
-          expect(res.body).to.eql({});
-        });
-    });
-    it('DELETE should return 400 invalid data type if paremetric contains invalid data', () => {
-      const testObject = { inc_votes: 1 };
-
-      return request
-        .delete('/api/articles/ff')
-        .send(testObject).expect(400)
-        .then((res) => {
-          expect(res.body.message).to.eql('invalid data type');
-        });
-    });
+    it('DELETE should return 204, delete chosen article and any foreign keys referencing the article', () => request
+      .delete('/api/articles/1')
+      .expect(204)
+      .then((res) => {
+        expect(res.body).to.eql({});
+      }));
+    it('DELETE should return 400 invalid data type if paremetric contains invalid data', () => request
+      .delete('/api/articles/ff')
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).to.eql('invalid data type');
+      }));
+    it('DELETE should return 404 path does not exist', () => request
+      .delete('/api/articles/1000')
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).to.eql('path does not exist');
+      }));
 
     it('Should return "method not allowed" messages for all request types not used for this path', () => {
       const invalidMethods = ['put'];

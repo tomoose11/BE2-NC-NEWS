@@ -7,10 +7,18 @@ const {
   deleteOneArticle,
   getArrayOfCommentsForOneArticle,
   postOneCommentForAnArticle,
+  increaseVotesForComments,
+  deleteOneComment,
 } = require('../controllers/articlesController');
 
 
 articleRouter.route('/').get(getArticles).all(handle405);
+
+articleRouter.param('comment_id', (req, res, next) => {
+  if (!req.params.comment_id.toString().match(/^\d+$/g)) {
+    next({ status: 400, message: 'invalid data type' });
+  } else { next(); }
+});
 
 articleRouter
   .param('article_id', (req, res, next) => {
@@ -25,6 +33,11 @@ articleRouter
 articleRouter.route('/:article_id/comments')
   .get(getArrayOfCommentsForOneArticle)
   .post(postOneCommentForAnArticle)
+  .all(handle405);
+
+articleRouter.route('/:article_id/comments/:comment_id')
+  .patch(increaseVotesForComments)
+  .delete(deleteOneComment)
   .all(handle405);
 
 module.exports = articleRouter;

@@ -37,7 +37,7 @@ exports.increaseVotes = (req, res, next) => {
     })
     .returning('*')
     .then((article) => {
-      if (typeof inc_votes !== 'number') {
+      if (typeof inc_votes !== 'number' && inc_votes) {
         next({ status: 400, message: 'invalid data type' });
       } else {
         res.send(article[0]);
@@ -53,8 +53,10 @@ exports.deleteOneArticle = (req, res, next) => {
     .where('article_id', req.params.article_id)
     .del()
     .returning('*')
-    .then(() => {
-      res.status(204).send();
+    .then((article) => {
+      if (article.length === 0) {
+        res.status(404).send({ status: 404, message: 'path does not exist' });
+      } else { res.status(204).send(); }
     })
     .catch(next);
 };
@@ -91,9 +93,48 @@ exports.postOneCommentForAnArticle = (req, res, next) => {
       res.status(201).send(comment[0]);
     })
     .catch((err) => {
-      if (err.code === '23503') {
+      if (err.code === '23503' && err.constraint === 'comments_user_id_foreign') {
+        next({ status: 400, message: 'no user has this id' });
+      } else if (err.code === '23503') {
         next({ status: 404, message: 'path does not exist' });
+      } else { next(err); }
+    });
+};
+
+exports.increaseVotesForComments = (req, res, next) => {
+  const { inc_votes } = req.body;
+  db('comments')
+    .select()
+    .where('comments.comment_id', req.params.comment_id)
+    .andWhere('comments.article_id', req.params.article_id)
+    .modify((queryBuilder) => {
+      if (inc_votes >= 0) {
+        queryBuilder.increment('votes', inc_votes);
       }
-      next(err);
+      if (inc_votes < 0) {
+        const dec = inc_votes * -1;
+        queryBuilder.decrement('votes', dec);
+      }
+    })
+    .returning('*')
+    .then((comment) => {
+      if (comment.length === 0) next({ status: 404, message: 'path does not exist' });
+      else if (typeof inc_votes !== 'number') {
+        next({ status: 400, message: 'invalid data type' });
+      } else {
+        res.send(comment[0]);
+      }
+    })
+    .catch(err => console.log(err));
+};
+
+exports.deleteOneComment = (req, res, next) => {
+  db('comments')
+    .select()
+    .where('comment_id', req.params.comment_id)
+    .del()
+    .returning('*')
+    .then((comment) => {
+      res.send(comment);
     });
 };
