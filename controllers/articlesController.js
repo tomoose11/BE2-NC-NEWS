@@ -135,6 +135,8 @@ exports.deleteOneComment = (req, res, next) => {
     .del()
     .returning('*')
     .then((comment) => {
-      res.send(comment);
+      if (comment.length === 0) {
+        res.status(404).send({ status: 404, message: 'path does not exist' });
+      } else { res.status(204).send(); }
     });
 };

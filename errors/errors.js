@@ -8,9 +8,9 @@ exports.error404 = ('/*', (req, res, next) => {
 });
 
 exports.handle400atRouter = (id, next) => {
-  if (id.match(/[0-9]/g)) {
-    next();
-  } else { next({ status: 400, message: 'invalid data type' }); }
+  if (!id.toString().match(/^\d+$/g)) {
+    next({ status: 400, message: 'invalid data type' });
+  } else { next(); }
 };
 
 exports.handle400 = (err, req, res, next) => {

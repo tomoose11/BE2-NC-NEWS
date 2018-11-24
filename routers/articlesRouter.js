@@ -15,9 +15,7 @@ const {
 articleRouter.route('/').get(getArticles).all(handle405);
 
 articleRouter.param('comment_id', (req, res, next) => {
-  if (!req.params.comment_id.toString().match(/^\d+$/g)) {
-    next({ status: 400, message: 'invalid data type' });
-  } else { next(); }
+  handle400atRouter(req.params.comment_id, next);
 });
 
 articleRouter

@@ -376,15 +376,82 @@ describe('/api', () => {
 
 
   describe('/comments/:comment_id', () => {
-    it('PATCH should return 400 and invalid data type message if data invalid', () => {
-      const testObject = { inc_votes: 'ff' };
+    it('PATCH should return 200 and update the votes of chosen comment', () => {
+      const testObject = { inc_votes: 1 };
 
       return request
-        .patch('/api/comments/1')
+        .patch('/api/articles/1/comments/1')
+        .send(testObject).expect(200)
+        .then((res) => {
+          expect(res.body.votes).to.eql(101);
+        });
+    });
+    it('PATCH should return 404 and page not found when parametric endpoint doesnt match an id', () => {
+      const testObject = { inc_votes: 1 };
+
+      return request
+        .patch('/api/articles/3/comments/2000')
+        .send(testObject).expect(404)
+        .then((res) => {
+          expect(res.body.message).to.eql('path does not exist');
+        });
+    });
+    it('PATCH should return 400 and invalid data type message if data invalid', () => {
+      const testObject = { inc_votes: 1 };
+
+      return request
+        .patch('/api/articles/3/comments/2g0')
         .send(testObject).expect(400)
         .then((res) => {
           expect(res.body.message).to.eql('invalid data type');
         });
+    });
+
+    it('DELETE should return 204, delete chosen article and any foreign keys referencing the article', () => request
+      .delete('/api/articles/1/comments/1')
+      .expect(204)
+      .then((res) => {
+        expect(res.body).to.eql({});
+      }));
+    it('DELETE should return 400 invalid data type if paremetric contains invalid data', () => request
+      .delete('/api/articles/2/comments/sefsf')
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).to.eql('invalid data type');
+      }));
+    it('DELETE should return 404 path does not exist', () => request
+      .delete('/api/articles/2/comments/1000')
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).to.eql('path does not exist');
+      }));
+  });
+
+
+  describe('/users', () => {
+    it('GET should return 200 and an array of user objects', () => request.get('/api/users')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users).to.be.an('array');
+        expect(body.users.length).to.equal(3);
+      }));
+    it('Should return "method not allowed" messages for all request types not used for this path', () => {
+      const invalidMethods = ['delete', 'put', 'patch'];
+      return Promise.all(invalidMethods.map(method => request[method]('/api/users').expect(405)));
+    });
+  });
+
+
+  describe('/users/:username', () => {
+    it('GET should return 200 and an array of user objects', () => request.get('/api/users/rogersop')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).to.be.an('object');
+        expect(body).to.have.all.keys('avatar_url', 'name', 'user_id', 'username');
+      }));
+    it('Should return "method not allowed" messages for all request types not used for this path', () => {
+      const invalidMethods = ['delete', 'put', 'patch'];
+      return Promise.all(invalidMethods.map(method => request[method]('/api/users').expect(405)));
     });
   });
 });
