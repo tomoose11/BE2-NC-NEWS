@@ -449,6 +449,12 @@ describe('/api', () => {
         expect(body).to.be.an('object');
         expect(body).to.have.all.keys('avatar_url', 'name', 'user_id', 'username');
       }));
+    it('GET should return 404 and an a path does not exist if username is not in db', () => request.get('/api/users/dave')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).to.eql('path does not exist');
+      }));
+
     it('Should return "method not allowed" messages for all request types not used for this path', () => {
       const invalidMethods = ['delete', 'put', 'patch'];
       return Promise.all(invalidMethods.map(method => request[method]('/api/users').expect(405)));
