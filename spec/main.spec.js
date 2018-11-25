@@ -376,7 +376,7 @@ describe('/api', () => {
 
 
   describe('/comments/:comment_id', () => {
-    it('PATCH should return 200 and update the votes of chosen comment', () => {
+    it('PATCH should return 200 and increase the votes of chosen comment', () => {
       const testObject = { inc_votes: 1 };
 
       return request
@@ -384,6 +384,16 @@ describe('/api', () => {
         .send(testObject).expect(200)
         .then((res) => {
           expect(res.body.votes).to.eql(101);
+        });
+    });
+    it('PATCH should return 200 and decrease the votes of chosen comment', () => {
+      const testObject = { inc_votes: -1 };
+
+      return request
+        .patch('/api/articles/1/comments/1')
+        .send(testObject).expect(200)
+        .then((res) => {
+          expect(res.body.votes).to.eql(99);
         });
     });
     it('PATCH should return 404 and page not found when parametric endpoint doesnt match an id', () => {
@@ -443,16 +453,21 @@ describe('/api', () => {
 
 
   describe('/users/:username', () => {
-    it('GET should return 200 and an array of user objects', () => request.get('/api/users/rogersop')
+    it('GET should return 200 and an array of user objects', () => request.get('/api/users/1')
       .expect(200)
       .then(({ body }) => {
         expect(body).to.be.an('object');
         expect(body).to.have.all.keys('avatar_url', 'name', 'user_id', 'username');
       }));
-    it('GET should return 404 and an a path does not exist if username is not in db', () => request.get('/api/users/dave')
+    it('GET should return 404 and an a path does not exist if username is not in db', () => request.get('/api/users/1000')
       .expect(404)
       .then(({ body }) => {
         expect(body.message).to.eql('path does not exist');
+      }));
+    it('GET should return 404 and an a path does not exist if username is not in db', () => request.get('/api/users/1ff')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).to.eql('invalid data type');
       }));
 
     it('Should return "method not allowed" messages for all request types not used for this path', () => {

@@ -5,7 +5,7 @@ exports.getUsers = (req, res, next) => {
 };
 
 exports.getUserByUsername = (req, res, next) => {
-  db('users').select().where('username', req.params.username)
+  db('users').select().where('user_id', req.params.user_id)
     .then((users) => {
       if (users.length === 0) {
         next({ status: 404, message: 'path does not exist' });

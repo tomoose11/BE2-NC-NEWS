@@ -31,11 +31,11 @@ for development and testing purposes new will need the following:
 
 To run the development server, move into the root directory of the project and use the command: `npm run dev`
 
-3. navigate to a url of your choice in the browser `http://localhost:9090/api`
+- navigate to a url of your choice in the browser `http://localhost:9090/api`
 
-4. To run tests use the command `npm t`
+- To run tests use the command `npm t`
 
-5. this is a url to the api hosted on heroku, here you will find a list of the different endpoints available:
+- this is a url to the api hosted on heroku, here you will find a list of the different endpoints available:
 
 `https://tom-nc-knews.herokuapp.com/api`
 
@@ -59,7 +59,7 @@ E.g.
         expect(body.topics.length).to.equal(2);
       }));
 ```
-In the above example the describe block tell us which endpoint we are testing. The it block tell us what we expect to happen when this url is requested. we test that we will recieve an array, and all the keys are what we expect then to be. We also check that the array is of the correct length.
+In the above example the describe block tells us which endpoint we are testing. The it block tells us what we expect to happen when this url is requested. we test that we will recieve an array, and all the keys are what we expect them to be. We also check that the array is of the correct length.
 
 ### Deployment
 
@@ -71,7 +71,7 @@ Thomas Wall
 
 ### Acknowledgements
 
-Thanks to Northcoder for providing the instructions for this back end project.
+Thanks to Northcoders for providing the instructions for this back end project.
 
 
 

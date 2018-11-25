@@ -4,6 +4,7 @@ const { buildArticles } = require('../utils/queryBuilders');
 exports.getArticles = (req, res, next) => {
   buildArticles(req, res, next).then((articles) => {
     if (articles === 0) {
+      // checking query params art valid
       next({ status: 400, message: 'A valid integer must be provided' });
     } else if (articles.length === 0) {
       next({ status: 404, message: 'path does not exist' });
@@ -125,7 +126,7 @@ exports.increaseVotesForComments = (req, res, next) => {
         res.send(comment[0]);
       }
     })
-    .catch(err => console.log(err));
+    .catch(next);
 };
 
 exports.deleteOneComment = (req, res, next) => {
