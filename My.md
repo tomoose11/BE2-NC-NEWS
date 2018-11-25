@@ -59,6 +59,19 @@ E.g.
         expect(body.topics.length).to.equal(2);
       }));
 ```
+In the above example the describe block tell us which endpoint we are testing. The it block tell us what we expect to happen when this url is requested. we test that we will recieve an array, and all the keys are what we expect then to be. We also check that the array is of the correct length.
+
+### Deployment
+
+To deploy on heroku, create a new heroku project and make a commit to Github with your latest changes. at this point you can push the project to Heroku. Make sure any confidential config details are stored in heroku config variables and the config file is gitignored.
+
+### Authors
+
+Thomas Wall
+
+### Acknowledgements
+
+Thanks to Northcoder for providing the instructions for this back end project.
 
 
 
