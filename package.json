@@ -2,7 +2,7 @@
   "name": "BE2-NC-Knews",
   "version": "1.0.0",
   "engines": {
-    "node": "10.12.0"
+    "node": "11.3.0"
   },
   "description": "## Northcoders News API",
   "main": "index.js",
