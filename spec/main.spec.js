@@ -36,13 +36,19 @@ describe('/api', () => {
         slug: 'mit',
         description: 'The man',
       };
+      const expectedObject = {
+        topic: {
+          slug: 'mit',
+          description: 'The man',
+        },
+      };
       return request
         .post('/api/topics')
         .send(testObject).expect(201)
         .then((res) => {
           expect(res.body).to.be.an('object');
-          expect(res.body).to.eql(testObject);
-          expect(res.body).to.not.equal(testObject);
+          expect(res.body).to.eql(expectedObject);
+          expect(res.body).to.not.equal(expectedObject);
           expect(res.body);
         });
     });
@@ -124,12 +130,20 @@ describe('/api', () => {
         body: 'Well? Think about it.',
       };
 
+      const expectedObject = {
+        article: {
+          title: "They're not exactly dogs, are they?",
+          user_id: 2,
+          body: 'Well? Think about it.',
+        },
+      };
+
       return request
         .post('/api/topics/mitch/articles')
         .send(testObject).expect(201)
         .then((res) => {
           expect(res.body).to.be.an('object');
-          expect(res.body.title).to.eql("They're not exactly dogs, are they?");
+          expect(res.body.article.title).to.eql("They're not exactly dogs, are they?");
         });
     });
     it('POST should return 400 when null data is inserted into body', () => {
@@ -239,7 +253,7 @@ describe('/api', () => {
     it('GET should return 200 with a single articles object with same id as the one specified', () => request.get('/api/articles/1')
       .expect(200)
       .then(({ body }) => {
-        expect(body).to.have.all.keys('article_id', 'author', 'comments_count', 'created_at', 'title', 'topic', 'votes');
+        expect(body.article).to.have.all.keys('article_id', 'author', 'comments_count', 'created_at', 'title', 'topic', 'votes');
       }));
     it('GET should return 400 bad request when id datatype is invalid', () => request.get('/api/articles/ff')
       .expect(400)
@@ -253,7 +267,7 @@ describe('/api', () => {
         .patch('/api/articles/1')
         .send(testObject).expect(200)
         .then((res) => {
-          expect(res.body.votes).to.eql(1);
+          expect(res.body.article.votes).to.eql(1);
         });
     });
     it('PATCH should return 400 and invalid data type message if data invalid', () => {
@@ -321,8 +335,8 @@ describe('/api', () => {
         .post('/api/articles/1/comments')
         .send(testObject).expect(201)
         .then((res) => {
-          expect(res.body).to.be.an('object');
-          expect(res.body.body).to.eql('stuff');
+          expect(res.body.comment).to.be.an('object');
+          expect(res.body.comment.body).to.eql('stuff');
         });
     });
     it('POST should return 404 and message saying path does not exist', () => {
@@ -383,7 +397,7 @@ describe('/api', () => {
         .patch('/api/articles/1/comments/1')
         .send(testObject).expect(200)
         .then((res) => {
-          expect(res.body.votes).to.eql(101);
+          expect(res.body.comment.votes).to.eql(101);
         });
     });
     it('PATCH should return 200 and decrease the votes of chosen comment', () => {
@@ -393,7 +407,7 @@ describe('/api', () => {
         .patch('/api/articles/1/comments/1')
         .send(testObject).expect(200)
         .then((res) => {
-          expect(res.body.votes).to.eql(99);
+          expect(res.body.comment.votes).to.eql(99);
         });
     });
     it('PATCH should return 404 and page not found when parametric endpoint doesnt match an id', () => {

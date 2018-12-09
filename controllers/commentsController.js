@@ -19,7 +19,7 @@ exports.increaseVotesForComments = (req, res, next) => {
       if (typeof inc_votes !== 'number') {
         next({ status: 400, message: 'invalid data type' });
       } else {
-        res.send(comment[0]);
+        res.send({ comment: comment[0] });
       }
     });
 };
@@ -31,6 +31,10 @@ exports.deleteOneComment = (req, res, next) => {
     .del()
     .returning('*')
     .then((comment) => {
-      res.send(comment);
+      if (comment.length === 0) {
+        res.status(404).send({ status: 404, message: 'path does not exist' });
+      } else {
+        res.send();
+      }
     });
 };

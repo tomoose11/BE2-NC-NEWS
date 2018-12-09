@@ -2,24 +2,30 @@ const db = require('../db/connection');
 const { buildArticles } = require('../utils/queryBuilders');
 
 exports.getArticles = (req, res, next) => {
-  buildArticles(req, res, next).then((articles) => {
-    if (articles === 0) {
-      // checking query params art valid
-      next({ status: 400, message: 'A valid integer must be provided' });
-    } else if (articles.length === 0) {
-      next({ status: 404, message: 'path does not exist' });
-    } else {
-      res.send({ articles });
-    }
-  }).catch(next);
+  buildArticles(req, res, next)
+    .then((articles) => {
+      if (articles === 0) {
+        // checking query params art valid
+        next({ status: 400, message: 'A valid integer must be provided' });
+      } else if (articles.length === 0) {
+        next({ status: 404, message: 'path does not exist' });
+      } else {
+        res.send({ articles });
+      }
+    })
+    .catch(next);
 };
 
 exports.getOneArticle = (req, res, next) => {
-  buildArticles(req, res, next).then((article) => {
-    if (article.length === 0) {
-      next({ status: 404, message: 'path does not exist' });
-    } else { res.send(article[0]); }
-  }).catch(next);
+  buildArticles(req, res, next)
+    .then((article) => {
+      if (article.length === 0) {
+        next({ status: 404, message: 'path does not exist' });
+      } else {
+        res.send({ article: article[0] });
+      }
+    })
+    .catch(next);
 };
 
 exports.increaseVotes = (req, res, next) => {
@@ -41,12 +47,11 @@ exports.increaseVotes = (req, res, next) => {
       if (typeof inc_votes !== 'number' && inc_votes) {
         next({ status: 400, message: 'invalid data type' });
       } else {
-        res.send(article[0]);
+        res.send({ article: article[0] });
       }
     })
     .catch(next);
 };
-
 
 exports.deleteOneArticle = (req, res, next) => {
   db('articles')
@@ -57,7 +62,9 @@ exports.deleteOneArticle = (req, res, next) => {
     .then((article) => {
       if (article.length === 0) {
         res.status(404).send({ status: 404, message: 'path does not exist' });
-      } else { res.status(204).send(); }
+      } else {
+        res.status(204).send();
+      }
     })
     .catch(next);
 };
@@ -71,7 +78,14 @@ exports.getArrayOfCommentsForOneArticle = (req, res, next) => {
   } = req.query;
   const sortOrder = sort_ascending === 'true' ? 'asc' : 'desc';
   db('comments')
-    .column('article_id', 'comment_id', 'votes', 'created_at', { author: 'username' }, 'body')
+    .column(
+      'article_id',
+      'comment_id',
+      'votes',
+      'created_at',
+      { author: 'username' },
+      'body',
+    )
     .join('users', 'users.user_id', '=', 'comments.user_id')
     .limit(limit)
     .offset(p * limit)
@@ -80,7 +94,9 @@ exports.getArrayOfCommentsForOneArticle = (req, res, next) => {
     .then((comments) => {
       if (comments.length === 0) {
         next({ status: 404, message: 'path does not exist' });
-      } else { res.send({ comments }); }
+      } else {
+        res.send({ comments });
+      }
     })
     .catch(next);
 };
@@ -91,14 +107,19 @@ exports.postOneCommentForAnArticle = (req, res, next) => {
     .insert({ article_id: req.params.article_id, user_id, body })
     .returning('*')
     .then((comment) => {
-      res.status(201).send(comment[0]);
+      res.status(201).send({ comment: comment[0] });
     })
     .catch((err) => {
-      if (err.code === '23503' && err.constraint === 'comments_user_id_foreign') {
+      if (
+        err.code === '23503'
+        && err.constraint === 'comments_user_id_foreign'
+      ) {
         next({ status: 400, message: 'no user has this id' });
       } else if (err.code === '23503') {
         next({ status: 404, message: 'path does not exist' });
-      } else { next(err); }
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -119,11 +140,10 @@ exports.increaseVotesForComments = (req, res, next) => {
     })
     .returning('*')
     .then((comment) => {
-      if (comment.length === 0) next({ status: 404, message: 'path does not exist' });
-      else if (typeof inc_votes !== 'number') {
+      if (comment.length === 0) { next({ status: 404, message: 'path does not exist' }); } else if (typeof inc_votes !== 'number') {
         next({ status: 400, message: 'invalid data type' });
       } else {
-        res.send(comment[0]);
+        res.send({ comment: comment[0] });
       }
     })
     .catch(next);
@@ -138,6 +158,8 @@ exports.deleteOneComment = (req, res, next) => {
     .then((comment) => {
       if (comment.length === 0) {
         res.status(404).send({ status: 404, message: 'path does not exist' });
-      } else { res.status(204).send(); }
+      } else {
+        res.status(204).send();
+      }
     });
 };

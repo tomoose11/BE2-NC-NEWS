@@ -15,21 +15,23 @@ exports.postTopic = (req, res, next) => {
     .insert(req.body)
     .returning('*')
     .then((topics) => {
-      res.status(201).send(topics[0]);
+      res.status(201).send({ topic: topics[0] });
     })
     .catch(next);
 };
 
 exports.getArticlesForOneTopic = (req, res, next) => {
-  buildArticles(req, res, next).then((articles) => {
-    if (articles === 0) {
-      next({ status: 400, message: 'A valid integer must be provided' });
-    } else if (articles.length === 0) {
-      next({ status: 404, message: 'path does not exist' });
-    } else {
-      res.send({ articles });
-    }
-  }).catch(next);
+  buildArticles(req, res, next)
+    .then((articles) => {
+      if (articles === 0) {
+        next({ status: 400, message: 'A valid integer must be provided' });
+      } else if (articles.length === 0) {
+        next({ status: 404, message: 'path does not exist' });
+      } else {
+        res.send({ articles });
+      }
+    })
+    .catch(next);
 };
 
 exports.postArticlesForOneTopic = (req, res, next) => {
@@ -44,7 +46,7 @@ exports.postArticlesForOneTopic = (req, res, next) => {
     })
     .returning('*')
     .then((article) => {
-      res.status(201).send(article[0]);
+      res.status(201).send({ article: article[0] });
     })
     .catch(next);
 };
