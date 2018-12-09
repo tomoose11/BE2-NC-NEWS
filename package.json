@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "## Northcoders News API",
   "main": "index.js",
+  "engines": {
+    "node": ">=10.12.0",
+    "npm": ">=6.4.1"
+  },
   "scripts": {
-    "start":"node listen.js",
+    "start": "node listen.js",
     "test": "mocha spec",
     "lint": "eslint ./ --fix",
     "pre-commit": "npm t",
@@ -13,8 +17,8 @@
     "reset": "knex migrate:rollback && knex migrate:latest && knex seed:run ./seeds/seed.js",
     "dev": "nodemon listen.js",
     "seed:prod": "DB_URL=$(heroku config:get DATABASE_URL) knex seed:run --env production",
-  "migrate:latest:prod": "DB_URL=$(heroku config:get DATABASE_URL) knex migrate:latest --env production",
-  "migrate:rollback:prod": "DB_URL=$(heroku config:get DATABASE_URL) knex migrate:rollback --env production"
+    "migrate:latest:prod": "DB_URL=$(heroku config:get DATABASE_URL) knex migrate:latest --env production",
+    "migrate:rollback:prod": "DB_URL=$(heroku config:get DATABASE_URL) knex migrate:rollback --env production"
   },
   "repository": {
     "type": "git",
