@@ -11,7 +11,8 @@ exports.buildArticles = (req, res, next) => {
     'article_id',
     'votes',
     'comment_count',
-    'created_at'
+    'created_at',
+    'body'
   ];
 
   if (!sortOb.includes(sort_by)) {
