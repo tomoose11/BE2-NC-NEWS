@@ -1,15 +1,19 @@
 const db = require('../db/connection');
 
 exports.buildArticles = (req, res, next) => {
-  const {
-    limit = 10,
-    p = 0,
-    sort_ascending = 'false',
-  } = req.query;
+  const { limit = 10, p = 0, sort_ascending = 'false' } = req.query;
   let sort_by = req.query.sort_by || 'created_at';
   const sortOrder = sort_ascending === 'true' ? 'asc' : 'desc';
 
-  const sortOb = ['author', 'title', 'article_id', 'votes', 'comment_count', 'created_at'];
+  const sortOb = [
+    'author',
+    'title',
+    'article_id',
+    'votes',
+    'comment_count',
+    'created_at',
+    'body'
+  ];
 
   if (!sortOb.includes(sort_by)) {
     sort_by = 'created_at';
@@ -19,16 +23,24 @@ exports.buildArticles = (req, res, next) => {
     return new Promise(resolve => resolve(0));
   }
 
-
-  return db('comments').rightJoin('articles', 'comments.article_id', 'articles.article_id')
+  return db('comments')
+    .rightJoin('articles', 'comments.article_id', 'articles.article_id')
     .leftJoin('users', 'articles.user_id', 'users.user_id')
     .groupBy('articles.article_id', 'username')
-    .column({ author: 'users.username' }, 'articles.title', 'articles.article_id', 'articles.votes', 'articles.created_at', 'articles.topic')
+    .column(
+      { author: 'users.username' },
+      'articles.title',
+      'articles.article_id',
+      'articles.votes',
+      'articles.created_at',
+      'articles.topic',
+      'articles.body'
+    )
     .count({ comments_count: 'comments.comment_id' })
     .limit(limit)
     .offset(p * limit)
     .orderBy(sort_by, sortOrder)
-    .modify((qb) => {
+    .modify(qb => {
       if (req.params.topic) {
         qb.where('topic', req.params.topic);
       }

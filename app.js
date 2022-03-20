@@ -1,12 +1,22 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const {
-  error404, handle422, handle400, handle404forNonExistingPostParents,
+  error404,
+  handle422,
+  handle400,
+  handle404forNonExistingPostParents
 } = require('./errors/errors');
+var cors = require('cors');
+
 const apiRouter = require('./routers/apiRouter');
 
 const app = express();
 
+app.use(cors());
+
+app.get('/products/:id', function(req, res, next) {
+  res.json({ msg: 'This is CORS-enabled for all origins!' });
+});
 
 app.use(bodyParser.json());
 
@@ -16,19 +26,21 @@ app.use('/*', (req, res, next) => {
   next({ status: 404, message: 'path does not exist' });
 });
 
-
 app.use(handle422);
 
 app.use(handle400);
 
 app.use(handle404forNonExistingPostParents);
 
-
 app.use((err, req, res, next) => {
   if (err.status) {
-    return res.status(err.status).send({ status: err.status, message: err.message });
+    return res
+      .status(err.status)
+      .send({ status: err.status, message: err.message });
   }
-  return res.status(500).send({ status: 500, message: 'Internal server error' });
+  return res
+    .status(500)
+    .send({ status: 500, message: 'Internal server error' });
 });
 
 module.exports = app;
