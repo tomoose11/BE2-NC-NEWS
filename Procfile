@@ -1,1 +1,1 @@
-worker: node listen.js
+web:node listen.js
