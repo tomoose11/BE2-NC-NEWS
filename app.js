@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 app.use('/api', apiRouter);
 
 app.use('/*', (req, res, next) => {
-  next({ status: 404, message: 'path does not exist' });
+  next({ status: 404, message: 'path does not  exist' });
 });
 
 app.use(handle422);
