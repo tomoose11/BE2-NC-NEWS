@@ -2,6 +2,7 @@ const db = require('../db/connection');
 const { buildArticles } = require('../utils/queryBuilders');
 
 exports.getArticles = (req, res, next) => {
+  console.log('part of');
   buildArticles(req, res, next)
     .then((articles) => {
       if (articles === 0) {
