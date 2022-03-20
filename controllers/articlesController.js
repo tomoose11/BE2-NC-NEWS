@@ -1,4 +1,4 @@
-const { restart } = require('nodemon');
+// const { restart } = require('nodemon');
 const db = require('../db/connection');
 const { buildArticles } = require('../utils/queryBuilders');
 
