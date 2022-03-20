@@ -14,7 +14,9 @@ exports.getArticles = (req, res, next) => {
         res.send({ articles });
       }
     })
-    .catch(next);
+    .catch((e) => {
+      console.log(e);
+    });
 };
 
 exports.getOneArticle = (req, res, next) => {
