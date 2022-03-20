@@ -3,8 +3,18 @@ const db = require('../db/connection');
 const { buildArticles } = require('../utils/queryBuilders');
 
 exports.getArticles = (req, res, next) => {
-  console.log('part of');
-  res.send({ yo: 1 });
+  buildArticles(req, res, next)
+    .then((articles) => {
+      if (articles === 0) {
+        // checking query params art valid
+        next({ status: 400, message: 'A valid integer must be provided' });
+      } else if (articles.length === 0) {
+        next({ status: 404, message: 'path does not exist' });
+      } else {
+        res.send({ articles });
+      }
+    })
+    .catch(next);
 };
 
 exports.getOneArticle = (req, res, next) => {
