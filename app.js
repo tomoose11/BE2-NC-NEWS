@@ -1,18 +1,18 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const {
   error404,
   handle422,
   handle400,
   handle404forNonExistingPostParents,
 } = require('./errors/errors');
-// var cors = require('cors');
 
 const apiRouter = require('./routers/apiRouter');
 
 const app = express();
 
-// app.use(cors());
+app.use(cors());
 
 // app.get('/products/:id', function(req, res, next) {
 //   res.json({ msg: 'This is CORS-enabled for all origins!' });
